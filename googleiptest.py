@@ -2,7 +2,7 @@
 #!/usr/bin/env python
 __author__ = 'jacky'
 
-import urllib
+import urllib2
 import re
 import threading
 
@@ -48,7 +48,7 @@ class Fetcher(threading.Thread):
 
     def run(self):
         try:
-            retval = urllib.urlopen(self.url)
+            retval = urllib2.urlopen(self.url, timeout=3)
             avlist.append(self.url)
         except IOError:
             pass
