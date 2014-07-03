@@ -5,6 +5,8 @@ __author__ = 'jacky'
 import urllib2
 import re
 import threading
+import httplib
+import urlparse
 
 avlist = []
 unlist = []
@@ -22,7 +24,7 @@ class Dispatcher(object):
         list_len = len(self.urllist)
         print list_len
         for i in range(0, list_len):
-            self.thread_pool.append(Fetcher(self.urllist[list_len - i - 1], self.sem))
+            self.thread_pool.append(Fetcher(urlparse.urlparse(self.urllist[list_len - i - 1]).hostname, self.sem))
 
     def go(self):
         i = 0
@@ -45,10 +47,12 @@ class Fetcher(threading.Thread):
         threading.Thread.__init__(self)
         self.url = url
         self.sem = sem
+        self.conn = httplib.HTTPSConnection(url, timeout=3)
 
     def run(self):
         try:
-            retval = urllib2.urlopen(self.url, timeout=3)
+            # retval = urllib2.urlopen(self.url, timeout=3)
+            self.conn.request("GET", "/")
             avlist.append(self.url)
         except IOError:
             pass
@@ -62,6 +66,6 @@ if __name__ == '__main__':
     dpt = Dispatcher()
     dpt.go()
     for each in avlist:
-        print each
+        print "https://" + each
 
 
